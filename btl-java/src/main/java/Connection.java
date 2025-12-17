@@ -21,6 +21,25 @@ public class Connection {
 		this.collection = database.getCollection("users");
 	}
 
+	public boolean checkUser(String username) {
+		Document existingUser = collection.find(eq("username", username)).first();
+		if (existingUser != null) {
+			System.out
+					.println("❌ LỖI: Tên người dùng [" + username + "] đã có trong hệ thống, vui lòng nhập tên khác!");
+			return false; // Dừng lại, không thực hiện insert
+		}
+		return true;
+	}
+
+	public boolean checkEmail(String email) {
+		Document existingEmail = collection.find(eq("email", email)).first();
+		if (existingEmail != null) {
+			System.out.println("❌ LỖI: Email [" + email + "] đã có trong hệ thống, vui lòng nhập email khác!");
+			return false; // Dừng lại, không thực hiện insert
+		}
+		return true;
+	}
+
 	// --- 1. THÊM NGƯỜI DÙNG (CREATE) ---
 	public void addUser(String username, String email, String password, double money, String role) {
 		// 1. Kiểm tra xem username đã tồn tại trong Database chưa
@@ -123,7 +142,6 @@ public class Connection {
 				.first();
 
 		if ((user != null)) {
-			System.out.println("=> Đăng nhập thành công! Chào mừng " + username);
 			return user;
 		} else {
 			System.out.println("=> Đăng nhập thất bại: Sai tài khoản, mật khẩu hoặc tài khoản bị khóa.");

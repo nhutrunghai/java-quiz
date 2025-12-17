@@ -41,7 +41,7 @@ public class HandleHistory {
 			stt++;
 		}
 		if (!found) {
-			System.out.println("Khong co lich su choi nao.");
+			System.out.println("🟡 Khong co lich su choi nao.");
 		}
 
 	}
