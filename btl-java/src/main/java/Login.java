@@ -1,133 +1,193 @@
-import java.io.Console;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
+import org.bson.Document;
+
 public class Login {
-	private static final String USER_FILE = "users.txt";
+	Scanner scanner = new Scanner(System.in);
+	Connection userService = new Connection();
 
-	private static Map<String, String[]> loadUsers() {
-		Map<String, String[]> users = new LinkedHashMap<>();
-		try {
-			if (!Files.exists(Paths.get(USER_FILE)))
-				return users;
-			List<String> lines = Files.readAllLines(Paths.get(USER_FILE));
-			for (String line : lines) {
-				if (line.trim().isEmpty())
-					continue;
-				String[] parts = line.split("\\|");
-				if (parts.length >= 4) {
-					users.put(parts[0], new String[] { parts[1], parts[2], parts[3] });
-				}
+	public Document welcome() {
+		while (true)// Chạy cho đến khi break (chọn 1)
+		{
+			System.out.println("\n===== CHÀO MỪNG TRỞ LẠI =====");
+			System.out.println("1. Đăng nhập");
+			System.out.println("2. Đăng ký");
+			System.out.print("Chọn chức năng (1-2): ");
+			// Đọc số và xóa bộ đệm dòng để tránh trôi lệnh
+			int check = Integer.parseInt(scanner.nextLine());
+
+			if (check == 1) {
+				// Sau khi thoát vòng lặp này, bạn sẽ gọi hàm login() ở bên dưới
+				return sign_in();
 			}
-		} catch (IOException e) {
-			System.out.println("Không thể đọc users.txt: " + e.getMessage());
-		}
-		return users;
-	}
+			if (check == 2) {
+				System.out.print("Nhập username: ");
+				String user = scanner.nextLine();
+				System.out.print("Nhập email: ");
+				String email = scanner.nextLine();
+				System.out.print("Nhập password: ");
+				String pass = scanner.nextLine();
 
-	private static void saveUsers(Map<String, String[]> users) {
-		try (PrintWriter pw = new PrintWriter(new FileWriter(USER_FILE))) {
-			for (Map.Entry<String, String[]> e : users.entrySet()) {
-				String name = e.getKey();
-				String[] data = e.getValue();
-				pw.println(name + "|" + data[0] + "|" + data[1] + "|" + data[2]);
+				// Gọi hàm addUser đã có logic kiểm tra trùng username
+				userService.sign_up(user, email, pass);
 			}
-		} catch (IOException ex) {
-			System.out.println("Lỗi khi lưu users.txt: " + ex.getMessage());
 		}
 	}
 
-	private static String hash(String input) {
-		try {
-			MessageDigest md = MessageDigest.getInstance("SHA-256");
-			byte[] b = md.digest(input.getBytes("UTF-8"));
-			StringBuilder sb = new StringBuilder();
-			for (byte x : b)
-				sb.append(String.format("%02x", x));
-			return sb.toString();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static String readPasswordPrompt(Scanner sc) {
-		Console console = System.console();
-		if (console != null) {
-			char[] passwd = console.readPassword("Nhập mật khẩu: ");
-			return new String(passwd);
-		} else {
-			System.out.print("Nhập mật khẩu (chú ý: trong VS Code mật khẩu có thể hiện ký tự): ");
-			return sc.nextLine();
-		}
-	}
-
-	public static String[] login() {
-		Scanner sc = new Scanner(System.in, "UTF-8");
-		Map<String, String[]> users = loadUsers();
-
+	public Document sign_in() {
 		while (true) {
-			System.out.print("Nhập tên người chơi: ");
-			String name = sc.nextLine().trim();
-			if (name.isEmpty())
-				continue;
+			Document loggedInUser = null;
+			while (loggedInUser == null) {
+				System.out.println("--- ĐĂNG NHẬP HỆ THỐNG ---");
+				System.out.print("Username: ");
+				String user = scanner.nextLine();
+				System.out.print("Password: ");
+				String pass = scanner.nextLine();
 
-			if (users.containsKey(name)) {
-				System.out.println("Tài khoản tìm thấy. Vui lòng nhập mật khẩu.");
-				String pass = readPasswordPrompt(sc);
-				String hashed = hash(pass);
-				if (hashed.equals(users.get(name)[0])) {
-					System.out.println("✅ Đăng nhập thành công. Xin chào " + name + "!");
-					return new String[] { name, users.get(name)[1], users.get(name)[2] };
-				} else {
-					System.out.println("❌ Sai mật khẩu. Thử lại.");
+				loggedInUser = userService.login(user, pass);
+				if (loggedInUser != null) {
+					System.out.println("Quyền hạn của bạn: " + loggedInUser.getString("role"));
+					manage_user();
+					return loggedInUser;
+				}
 
-				}
-			} else {
-				System.out.print("Tài khoản chưa tồn tại. Tạo mới? (y/n): ");
-				String c = sc.nextLine().trim();
-				if (c.equalsIgnoreCase("y")) {
-					String pass = readPasswordPrompt(sc);
-					String hashed = hash(pass);
-					users.put(name, new String[] { hashed, "0", "0" });
-					saveUsers(users);
-					System.out.println("✅ Tạo tài khoản thành công. Xin chào " + name + "!");
-					return new String[] { name, "0", "0" };
-				} else {
-					System.out.println("Quay lại đăng nhập...");
-				}
 			}
 		}
 	}
 
-	public static void updateUser(String name, int correct, int money) {
-		Map<String, String[]> users = loadUsers();
-		if (!users.containsKey(name)) {
-			// shouldn't happen, but create
-			users.put(name, new String[] { "", String.valueOf(correct), String.valueOf(money) });
-			saveUsers(users);
-			return;
+	public void ask_manager() {
+		while (true) {
+			System.out.println("\n===== HỆ THỐNG QUẢN LÝ  =====");
+			System.out.println("1. Truy cập vào quản lý");
+			System.out.println("2. Chơi");
+			System.out.print("Chọn chức năng (1-2): ");
+			int check = Integer.parseInt(scanner.nextLine());
+			if (check == 1) {
+				manage_user();
+				break;
+			} else {
+				break;
+			}
 		}
-		String[] data = users.get(name);
-		int bestCorrect = Integer.parseInt(data[1]);
-		int bestMoney = Integer.parseInt(data[2]);
-		boolean changed = false;
-		if (correct > bestCorrect) {
-			data[1] = String.valueOf(correct);
-			changed = true;
+	}
+
+	public void manage_user() {
+		while (true) {
+			System.out.println("\n===== HỆ THỐNG QUẢN LÝ NGƯỜI DÙNG =====");
+			System.out.println("1. Hiển thị danh sách người dùng");
+			System.out.println("2. Thêm người dùng mới");
+			System.out.println("3. Sửa thông tin người dùng");
+			System.out.println("4. Xóa người dùng");
+			System.out.println("0. Thoát chương trình");
+			System.out.print("Chọn chức năng (0-4): ");
+
+			int selected;
+			// Kiểm tra nếu người dùng nhập không phải là số
+			if (!scanner.hasNextInt()) {
+				System.out.println("Vui lòng chỉ nhập số!");
+				scanner.next();
+				continue;
+			}
+
+			selected = scanner.nextInt();
+			scanner.nextLine(); // Đọc bỏ dòng trống sau khi nhập số
+
+			switch (selected) {
+			case 1:
+				userService.displayAllUsers();
+				break;
+
+			case 2:
+				System.out.print("Nhập username: ");
+				String user = scanner.nextLine();
+				System.out.print("Nhập email: ");
+				String email = scanner.nextLine();
+				System.out.print("Nhập password: ");
+				String pass = scanner.nextLine();
+//				System.out.print("Nhập số tiền: ");
+//				double money = scanner.nextDouble();
+//				scanner.nextLine();
+				double money;
+				while (true) {
+					try {
+						System.out.print("Nhập số tiền: ");
+						String input = scanner.nextLine(); // Đọc dạng chuỗi trước
+						money = Double.parseDouble(input); // Thử chuyển sang số
+
+						if (money <= 0) {
+							System.out.println("❌ Số tiền không được bằng 0 hoặc âm. Vui lòng nhập lại!");
+							continue;
+						}
+						break;
+					} catch (NumberFormatException e) {
+						System.out.println("❌ Lỗi: Vui lòng nhập số hợp lệ (ví dụ: 100.5)!");
+					}
+				}
+				String role;
+				while (true) {
+					System.out.print("Nhập vai trò (admin/user): ");
+					role = scanner.nextLine();
+
+					if ((!role.equals("admin") && (!role.equals("user")))) {
+						System.out.println("❌ Lỗi: Vui lòng nhập vai trò hợp lệ (ví dụ: user)!");
+						continue;
+					}
+					break;
+				}
+
+				userService.addUser(user, email, pass, money, role);
+				break;
+
+			case 3:
+				System.out.print("Nhập username cần sửa thông tin: ");
+				String uUpdate = scanner.nextLine();
+
+				// Kiểm tra xem người dùng có tồn tại không trước khi bắt nhập đống thông tin
+				// (Giả sử bạn có hàm findUser hoặc dùng collection.find trong Connection)
+
+				System.out.println("--- Nhập thông tin mới ---");
+				System.out.print("Username mới: ");
+				String nUsername = scanner.nextLine();
+				System.out.print("Email mới: ");
+				String nEmail = scanner.nextLine();
+
+				System.out.print("Mật khẩu mới: ");
+				String nPass = scanner.nextLine();
+
+				double nMoney = 0;
+				while (true) {
+					try {
+						System.out.print("Số tiền mới: ");
+						nMoney = Double.parseDouble(scanner.nextLine());
+						break;
+					} catch (Exception e) {
+						System.out.println("❌ Vui lòng nhập số tiền hợp lệ!");
+					}
+				}
+
+				System.out.print("Vai trò mới (ADMIN/USER): ");
+				String nRole = scanner.nextLine();
+
+				System.out.print("Trạng thái hoạt động (true/false): ");
+				boolean nStatus = Boolean.parseBoolean(scanner.nextLine());
+
+				// Gọi hàm cập nhật tổng thể
+				userService.updateFullUserInfo(uUpdate, nUsername, nEmail, nPass, nMoney, nRole, nStatus);
+				break;
+
+			case 4:
+				System.out.print("Nhập username cần xóa: ");
+				String uDelete = scanner.nextLine();
+				userService.deleteUser(uDelete);
+				break;
+
+			case 0:
+				System.out.println("Đang thoát...");
+				scanner.close();
+				return;
+			default:
+				System.out.println("Lựa chọn không hợp lệ!");
+			}
 		}
-		if (money > bestMoney) {
-			data[2] = String.valueOf(money);
-			changed = true;
-		}
-		if (changed)
-			saveUsers(users);
 	}
 }

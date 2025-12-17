@@ -1,9 +1,3 @@
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,25 +13,11 @@ public class Main {
 	public static final String GREEN = "\u001B[32m";
 
 	public static void main(String[] args) {
-		// Ket noi db
 		Connection userService = new Connection();
-
-		// Tat log MongoDB driver
 		Logger.getLogger("org.mongodb.driver").setLevel(Level.OFF);
-		Document loggedInUser = null;
-		while (loggedInUser == null) {
-			System.out.println("--- DANG NHAP HE THONG ---");
-			System.out.print("Username: ");
-			String user = sc.nextLine();
-			System.out.print("Password: ");
-			String pass = sc.nextLine();
 
-			loggedInUser = userService.login(user, pass);
-		}
-		System.out.println(GREEN + "Dang nhap thanh cong! Chao mung " + loggedInUser.getString("username") + RESET);
-
+		Document loggedInUser = loginLoop(userService);
 		boolean isAdmin = "admin".equalsIgnoreCase(loggedInUser.getString("role"));
-
 
 		boolean exit = false;
 		while (!exit) {
@@ -45,14 +25,33 @@ public class Main {
 			switch (choice) {
 			case 1:
 				HandleQuestion.Result result = HandleQuestion.play(sc);
-				
+				if (result != null) {
+					System.out.println("\n===== KET QUA =====");
+					System.out.println("Nguoi choi: " + loggedInUser.getString("username"));
+					System.out.println("So cau dung: " + result.getCorrectCount());
+					System.out.println("Tien thuong: " + result.getMoney() + " VND");
+				}
 				break;
-			case 0:
-				System.out.println("Tam biet!");
-				exit = true;
+			case 2:
+				System.out.println(
+						"\n===== LICH SU CHOI CUA " + loggedInUser.getString("username").toUpperCase() + " =====");
+				HandleHistory.showHistory(loggedInUser.getObjectId("_id").toHexString(),
+						loggedInUser.getString("username"));
+				break;
+			case 3:
+				HandlePlayer.showPlayerStats(loggedInUser.getObjectId("_id").toHexString(),
+						loggedInUser.getString("username"));
 				break;
 			case 4:
+				System.out.println("Bang xep hang tam thoi chua ho tro.");
+				break;
+			case 5:
 				handleAdminMenu(sc, userService);
+				break;
+			case 0:
+				System.out.println("Dang xuat...");
+				loggedInUser = loginLoop(userService);
+				isAdmin = "admin".equalsIgnoreCase(loggedInUser.getString("role"));
 				break;
 			default:
 				break;
@@ -60,17 +59,29 @@ public class Main {
 		}
 	}
 
+	private static Document loginLoop(Connection userService) {
+		Document loggedInUser = null;
+		while (loggedInUser == null) {
+			Login login = new Login();
+
+			loggedInUser = login.welcome();
+		}
+		System.out.println(GREEN + "Dang nhap thanh cong! Chao mung " + loggedInUser.getString("username") + RESET);
+		return loggedInUser;
+	}
+
 	private static int showMainMenu(Scanner sc, boolean isAdmin) {
 		while (true) {
 			System.out.println("\n===== MENU CHINH =====");
 			System.out.println("1. Bat dau choi");
 			System.out.println("2. Xem lich su choi");
-			System.out.println("3. Bang xep hang");
+			System.out.println("3. Thong ke nguoi choi");
+			System.out.println("4. Bang xep hang");
 			if (isAdmin) {
-				System.out.println("4. Quan tri admin");
+				System.out.println("5. Quan tri admin");
 			}
-			System.out.println("0. Thoat");
-			System.out.print("Chon (0-" + (isAdmin ? "4" : "3") + "): ");
+			System.out.println("0. Dang xuat");
+			System.out.print("Chon (0-" + (isAdmin ? "5" : "4") + "): ");
 			if (!sc.hasNextInt()) {
 				System.out.println("Vui long nhap so hop le.");
 				sc.nextLine();
@@ -78,7 +89,7 @@ public class Main {
 			}
 			int choice = sc.nextInt();
 			sc.nextLine(); // clear newline
-			int maxOption = isAdmin ? 4 : 3;
+			int maxOption = isAdmin ? 5 : 4;
 			if (choice < 0 || choice > maxOption) {
 				System.out.println("Lua chon khong hop le, thu lai.");
 				continue;
@@ -162,7 +173,7 @@ public class Main {
 					}
 				}
 
-				userService.updateUserStatus(uUpdate, newMoney, active);
+				// userService.updateUserStatus(uUpdate, newMoney, active);
 				break;
 			case 4:
 				System.out.print("Nhap username can xoa: ");
@@ -178,7 +189,4 @@ public class Main {
 			}
 		}
 	}
-
-
-
 }
