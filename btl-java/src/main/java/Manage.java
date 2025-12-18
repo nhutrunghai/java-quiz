@@ -34,7 +34,7 @@ public class Manage {
 			int selected;
 			// Kiểm tra nếu người dùng nhập không phải là số
 			if (!scanner.hasNextInt()) {
-				System.out.println("Vui lòng chỉ nhập số!");
+				System.out.println("⚠️ Vui lòng chỉ nhập số!");
 				scanner.next();
 				continue;
 			}
@@ -48,15 +48,15 @@ public class Manage {
 				break;
 
 			case 2:
-				System.out.print("Nhập username: ");
+				System.out.print("👤 Nhập username: ");
 				String user = scanner.nextLine();
 				if (!userService.checkUser(user)) {
 					break;
 				}
 				;
-				System.out.print("Nhập email: ");
+				System.out.print("📧 Nhập email: ");
 				String email = scanner.nextLine();
-				System.out.print("Nhập password: ");
+				System.out.print("🔒 Nhập password: ");
 				String pass = scanner.nextLine();
 //				System.out.print("Nhập số tiền: ");
 //				double money = scanner.nextDouble();
@@ -64,26 +64,26 @@ public class Manage {
 				double money;
 				while (true) {
 					try {
-						System.out.print("Nhập số tiền: ");
+						System.out.print("💰 Nhập số tiền: ");
 						String input = scanner.nextLine(); // Đọc dạng chuỗi trước
 						money = Double.parseDouble(input); // Thử chuyển sang số
 
 						if (money <= 0) {
-							System.out.println("❌ Số tiền không được bằng 0 hoặc âm. Vui lòng nhập lại!");
-							continue;
-						}
-						break;
-					} catch (NumberFormatException e) {
-						System.out.println("❌ Lỗi: Vui lòng nhập số hợp lệ (ví dụ: 100.5)!");
+						System.out.println("⚠️ Số tiền không được bằng 0 hoặc âm. Vui lòng nhập lại!");
+						continue;
 					}
+					break;
+				} catch (NumberFormatException e) {
+					System.out.println("❌ Lỗi: Vui lòng nhập số hợp lệ (ví dụ: 100.5)!");
 				}
+			}
 				String role;
 				while (true) {
-					System.out.print("Nhập vai trò (admin/user): ");
+					System.out.print("🎭 Nhập vai trò (admin/user): ");
 					role = scanner.nextLine();
 
 					if ((!role.equals("admin") && (!role.equals("user")))) {
-						System.out.println("❌ Lỗi: Vui lòng nhập vai trò hợp lệ (ví dụ: user)!");
+						System.out.println("⚠️ Lỗi: Vui lòng nhập vai trò hợp lệ (ví dụ: user)!");
 						continue;
 					}
 					break;
@@ -93,25 +93,25 @@ public class Manage {
 				break;
 
 			case 3:
-				System.out.print("Nhập username cần sửa thông tin: ");
+				System.out.print("👤 Nhập username cần sửa thông tin: ");
 				String uUpdate = scanner.nextLine();
 
 				// Kiểm tra xem người dùng có tồn tại không trước khi bắt nhập đống thông tin
 				// (Giả sử bạn có hàm findUser hoặc dùng collection.find trong Connection)
 
-				System.out.println("--- Nhập thông tin mới ---");
-				System.out.print("Username mới: ");
+				System.out.println("--- 🆕 Nhập thông tin mới ---");
+				System.out.print("👤 Username mới: ");
 				String nUsername = scanner.nextLine();
-				System.out.print("Email mới: ");
+				System.out.print("📧 Email mới: ");
 				String nEmail = scanner.nextLine();
 
-				System.out.print("Mật khẩu mới: ");
+				System.out.print("🔒 Mật khẩu mới: ");
 				String nPass = scanner.nextLine();
 
 				double nMoney = 0;
 				while (true) {
 					try {
-						System.out.print("Số tiền mới: ");
+						System.out.print("💰 Số tiền mới: ");
 						nMoney = Double.parseDouble(scanner.nextLine());
 						break;
 					} catch (Exception e) {
@@ -121,8 +121,8 @@ public class Manage {
 
 				String nRole;
 				while (true) {
-					System.out.print("Vai trò mới (ADMIN/USER): ");
-					nRole = scanner.nextLine();
+				System.out.print("🎭 Vai trò mới (ADMIN/USER): ");
+				nRole = scanner.nextLine();
 
 					if ((!nRole.equals("admin") && (!nRole.equals("user")))) {
 						System.out.println("❌ Lỗi: Vui lòng nhập vai trò hợp lệ (ví dụ: user)!");
@@ -131,12 +131,12 @@ public class Manage {
 					break;
 				}
 
-				System.out.print("Trạng thái hoạt động (true/false): ");
+				System.out.print("⚙️ Trạng thái hoạt động (true/false): ");
 				boolean nStatus;
 				while (true) {
 					nStatus = Boolean.parseBoolean(scanner.nextLine());
 					if ((nStatus != true) && (nStatus != false)) {
-						System.out.println("❌ Lỗi: Vui lòng nhập trạng thái hoạt động hợp lệ (ví dụ: true)!");
+						System.out.println("⚠️ Lỗi: Vui lòng nhập trạng thái hoạt động hợp lệ (ví dụ: true)!");
 						continue;
 					}
 					break;
@@ -156,7 +156,7 @@ public class Manage {
 				System.out.println("🚪 Đang thoát...");
 				return;
 			default:
-				System.out.println("Lựa chọn không hợp lệ!");
+				System.out.println("⚠️ Lựa chọn không hợp lệ!");
 			}
 		}
 	}

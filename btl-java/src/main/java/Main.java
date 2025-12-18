@@ -68,11 +68,16 @@ public class Main {
 						loggedInUser.getString("username"));
 				break;
 			case 5:
-				userService.displayLeaderboard();
+				userService.displayLeaderboard(loggedInUser.getString("username"));
 				break;
 			case 6:
 				Manage admin = new Manage();
 				admin.manage_user();
+				break;
+			case 7:
+				QuestionService questionService = new QuestionService();
+				ManageQuestions qManager = new ManageQuestions(questionService, sc);
+				qManager.showMenu();
 				break;
 			case 0:
 				System.out.println("Dang xuat...");	
@@ -92,7 +97,7 @@ public class Main {
 
 			loggedInUser = login.welcome();
 		}
-		System.out.println(GREEN + "✅ Dang nhap thanh cong! Chao mung " + loggedInUser.getString("username") + RESET);
+		System.out.println(GREEN + "\u2705 Dang nhap thanh cong! Chao mung " + loggedInUser.getString("username") + RESET);
 		return loggedInUser;
 	}
 
@@ -101,24 +106,31 @@ public class Main {
 			System.out.println("\n===== 📜 MENU CHINH =====");
 			System.out.println("1. 🎮 Bat dau choi");
 			System.out.println("2. 👤 Thong tin ca nhan");
-			System.out.println("3. 🕓 Xem lich su choi");
+			System.out.println("3. ⏱️ Xem lich su choi");
 			System.out.println("4. 📊 Thong ke nguoi choi");
 			System.out.println("5. 🏆 Bang xep hang");
 			if (isAdmin) {
 				System.out.println("6. 🛠️ Quan tri admin");
+				System.out.println("7. ❓ Quan tri cau hoi");
 			}
 			System.out.println("0. 🚪 Dang xuat");
-			System.out.print("👉 Chon (0-" + (isAdmin ? "6" : "5") + "): ");
-			if (!sc.hasNextInt()) {
-				System.out.println("Vui long nhap so hop le.");
-				sc.nextLine();
+			System.out.print("👉 Chon (0-" + (isAdmin ? "7" : "5") + "): ");
+
+			String line = sc.nextLine().trim();
+			if (line.isEmpty()) {
+				System.out.println("⚠️ Vui long nhap so hop le.");
 				continue;
 			}
-			int choice = sc.nextInt();
-			sc.nextLine(); // clear newline
-			int maxOption = isAdmin ? 6 : 5;
+			int choice;
+			try {
+				choice = Integer.parseInt(line);
+			} catch (NumberFormatException e) {
+				System.out.println("⚠️ Vui long nhap so hop le.");
+				continue;
+			}
+			int maxOption = isAdmin ? 7 : 5;
 			if (choice < 0 || choice > maxOption) {
-				System.out.println("Lua chon khong hop le, thu lai.");
+				System.out.println("\u2753 Lua chon khong hop le, thu lai.");
 				continue;
 			}
 			return choice;

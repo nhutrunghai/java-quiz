@@ -2,6 +2,9 @@ import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.or;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -12,7 +15,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
-
 public class Connection {
 	private MongoCollection<Document> collection;
 
@@ -42,10 +44,10 @@ public class Connection {
 	}
 
 	public void addUser(String username, String email, String password, double money, String role) {
-		Document existingUser = collection.find(eq("username", username)).first();
-
-		if (existingUser != null) {
-			System.out.println("❌ Loi: Ten nguoi dung [" + username + "] da co trong he thong, vui long nhap ten khac!");
+		if(!checkUser(username)){
+			return;
+		}
+		if(!checkEmail(email)){
 			return;
 		}
 		String hashedPassword = PasswordHasher.hashPassword(password);
@@ -57,10 +59,10 @@ public class Connection {
 	}
 
 	public void sign_up(String username, String email, String password) {
-		Document existingUser = collection.find(or(eq("username", username),eq("email",email))).first();
-
-		if (existingUser != null) {
-			System.out.println("❌ Loi: Ten nguoi dung [" + username + "] hoặc email [" + email + "] da co trong he thong, vui long nhap ten khac!");
+		if(!checkUser(username)){
+			return;
+		}
+		if(!checkEmail(email)){
 			return;
 		}
 
@@ -77,8 +79,8 @@ public class Connection {
 
 	public void displayAllUsers() {
 		System.out.println("📋 Danh sach nguoi dung:");
-		System.out.println(String.format("%-15s | %-20s | %-15s| %-15s | %-10s | %-10s", "Username", "Email",
-				"Password", "Money", "Role", "Active"));
+		System.out.println(String.format("%-15s | %-20s | %-15s | %-10s | %-10s", "👤 Username", "📧 Email",
+				"💰 Money", "🛡️ Role", "✅ Active"));
 		System.out.println("----------------------------------------------------------------------------------");
 
 		for (Document doc : collection.find()) {
@@ -89,8 +91,8 @@ public class Connection {
 				money = ((Number) moneyObj).doubleValue();
 			}
 
-			System.out.println(String.format("%-15s | %-20s | %-15s | %-15.2f | %-10s | %-10s",
-					doc.getString("username"), doc.getString("email"), doc.getString("password"), money,
+			System.out.println(String.format("%-15s | %-20s | %-15.2f | %-10s | %-10s",
+					doc.getString("username"), doc.getString("email"), money,
 					doc.getString("role"), doc.get("is_active")));
 		}
 	}
@@ -102,7 +104,7 @@ public class Connection {
 		Bson updates = Updates.combine(Updates.set("username", newUsername), Updates.set("email", newEmail),
 				Updates.set("password", newPass), Updates.set("money", newMoney), Updates.set("role", newRole),
 				Updates.set("is_active", newStatus));
-
+		
 		long modifiedCount = collection.updateOne(filter, updates).getModifiedCount();
 
 		if (modifiedCount > 0) {
@@ -163,7 +165,7 @@ public class Connection {
 		return collection.find(eq("_id", userId)).first();
 	}
 
-	public void displayLeaderboard() {
+	public void displayLeaderboard(String usernameInput) {
 		System.out.println("\n🏆 BANG XEP HANG NGUOI CHOI CAO NHAT");
 		System.out.printf("%-5s | %-15s | %-15s%n", "🏅 STT", "👤 Ten nguoi choi", "💰 So tien (VND)");
 		System.out.println("-------------------------------------------------------");
@@ -179,5 +181,20 @@ public class Connection {
 			System.out.printf("%-5d | %-15s | %-15.0f%n", rank++, username, money);
 		}
 		System.out.println("=======================================================");
+		List<Document> ranks = collection.find().sort(Sorts.descending("money")).into(new ArrayList<>());
+		int index = -1;
+		for(int i = 0; i < ranks.size();i++){
+			
+			if(ranks.get(i).getString("username").equals(usernameInput)){
+				index = i;
+				break;
+			}
+		}
+		
+		if(index != -1){
+			System.out.println("🏅 Hang của bạn là : " + (index + 1));
+		}
+
+
 	}
 }

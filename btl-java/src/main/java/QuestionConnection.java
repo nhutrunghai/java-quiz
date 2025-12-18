@@ -10,14 +10,18 @@ import java.util.List;
 
 public class QuestionConnection {
     private MongoCollection<Document> collection;
-
+	private MongoCollection<Document> qCollection;
     public QuestionConnection() {
         // Kết nối tới MongoDB
         MongoClient mongoClient = MongoClients.create("mongodb+srv://nhutrunghai_db_user:SaQjyJC8xvwjpI20@cluster0.9rj7y8x.mongodb.net/");
         MongoDatabase database = mongoClient.getDatabase("quiz");
         this.collection = database.getCollection("Questions");
+        // Đồng bộ cho QuestionService sử dụng
+        this.qCollection = this.collection;
     }
-
+	public MongoCollection<Document> getqCollection() {
+		return this.qCollection;
+	}
     /**
      * Lấy 1 câu hỏi ngẫu nhiên theo level
      */
