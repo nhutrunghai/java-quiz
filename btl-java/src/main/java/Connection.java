@@ -1,5 +1,6 @@
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.or;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -47,8 +48,8 @@ public class Connection {
 			System.out.println("❌ Loi: Ten nguoi dung [" + username + "] da co trong he thong, vui long nhap ten khac!");
 			return;
 		}
-
-		Document newUser = new Document("username", username).append("email", email).append("password", password)
+		String hashedPassword = PasswordHasher.hashPassword(password);
+		Document newUser = new Document("username", username).append("email", email).append("password", hashedPassword)
 				.append("money", money).append("role", role).append("is_active", true);
 
 		collection.insertOne(newUser);
@@ -56,17 +57,17 @@ public class Connection {
 	}
 
 	public void sign_up(String username, String email, String password) {
-		Document existingUser = collection.find(eq("username", username)).first();
+		Document existingUser = collection.find(or(eq("username", username),eq("email",email))).first();
 
 		if (existingUser != null) {
-			System.out.println("❌ Loi: Ten nguoi dung [" + username + "] da co trong he thong, vui long nhap ten khac!");
+			System.out.println("❌ Loi: Ten nguoi dung [" + username + "] hoặc email [" + email + "] da co trong he thong, vui long nhap ten khac!");
 			return;
 		}
 
 		Double money = 1000.0;
 		String role = "user";
-
-		Document newUser = new Document("username", username).append("email", email).append("password", password)
+		String hashedPassword = PasswordHasher.hashPassword(password);
+		Document newUser = new Document("username", username).append("email", email).append("password", hashedPassword)
 				.append("money", money).append("role", role).append("is_active", true);
 
 		collection.insertOne(newUser);
@@ -135,7 +136,8 @@ public class Connection {
 	}
 
 	public Document login(String username, String password) {
-		Document user = collection.find(and(eq("username", username), eq("password", password), eq("is_active", true)))
+		String hashedInput = PasswordHasher.hashPassword(password);
+		Document user = collection.find(and(eq("username", username), eq("password", hashedInput), eq("is_active", true)))
 				.first();
 
 		if ((user != null)) {
@@ -162,8 +164,8 @@ public class Connection {
 	}
 
 	public void displayLeaderboard() {
-		System.out.println("\n==========🏆 BANG XEP HANG NGUOI CHOI CAO NHAT ==========");
-		System.out.printf("%-5s | %-15s | %-15s%n", "STT", "Ten nguoi choi", "So tien (VND)");
+		System.out.println("\n🏆 BANG XEP HANG NGUOI CHOI CAO NHAT");
+		System.out.printf("%-5s | %-15s | %-15s%n", "🏅 STT", "👤 Ten nguoi choi", "💰 So tien (VND)");
 		System.out.println("-------------------------------------------------------");
 
 		int rank = 1;

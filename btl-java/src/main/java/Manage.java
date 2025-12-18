@@ -7,10 +7,10 @@ public class Manage {
 
 	public void ask_manager() {
 		while (true) {
-			System.out.println("\n===== HỆ THỐNG QUẢN LÝ  =====");
-			System.out.println("1. Truy cập vào quản lý");
-			System.out.println("2. Chơi");
-			System.out.print("Chọn chức năng (1-2): ");
+			System.out.println("\n===== 🛠️ HỆ THỐNG QUẢN LÝ =====");
+			System.out.println("1. 🔑 Truy cập vào quản lý");
+			System.out.println("2. 🎮 Chơi");
+			System.out.print("👉 Chọn chức năng (1-2): ");
 			int check = Integer.parseInt(scanner.nextLine());
 			if (check == 1) {
 				manage_user();
@@ -23,13 +23,13 @@ public class Manage {
 
 	public void manage_user() {
 		while (true) {
-			System.out.println("\n===== HỆ THỐNG QUẢN LÝ NGƯỜI DÙNG =====");
-			System.out.println("1. Hiển thị danh sách người dùng");
-			System.out.println("2. Thêm người dùng mới");
-			System.out.println("3. Sửa thông tin người dùng");
-			System.out.println("4. Xóa người dùng");
-			System.out.println("0. Thoát chương trình");
-			System.out.print("Chọn chức năng (0-4): ");
+			System.out.println("\n===== 🧑‍💻 QUẢN LÝ NGƯỜI DÙNG =====");
+			System.out.println("1. 📋 Hiển thị danh sách người dùng");
+			System.out.println("2. ➕ Thêm người dùng mới");
+			System.out.println("3. ✏️ Sửa thông tin người dùng");
+			System.out.println("4. 🗑️ Xóa người dùng");
+			System.out.println("0. 🚪 Thoát chương trình");
+			System.out.print("👉 Chọn chức năng (0-4): ");
 
 			int selected;
 			// Kiểm tra nếu người dùng nhập không phải là số
@@ -153,7 +153,7 @@ public class Manage {
 				break;
 
 			case 0:
-				System.out.println("Đang thoát...");
+				System.out.println("🚪 Đang thoát...");
 				return;
 			default:
 				System.out.println("Lựa chọn không hợp lệ!");
