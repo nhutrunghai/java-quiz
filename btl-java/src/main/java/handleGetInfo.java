@@ -27,12 +27,12 @@ public class handleGetInfo {
         String role = user.getString("role");
         String email = user.getString("email");
 
-        String border = "================Thong tin================";
+        String border = "================ 📇 Thong tin ================";
         System.out.println(border);
-        System.out.printf("=  %-10s: %-24s =%n", "username", username == null ? "" : username);
-        System.out.printf("=  %-10s: %-24s =%n", "money", money + " VNĐ");
-        System.out.printf("=  %-10s: %-24s =%n", "role", role == null ? "" : role);
-        System.out.printf("=  %-10s: %-24s =%n", "email", email == null ? "" : email);
-        System.out.println("=========================================");
+        System.out.printf("=  %-10s: %-27s %n", "👤 username", username == null ? "" : username);
+        System.out.printf("=  %-10s: %-27s %n", "💰 money", money + " VND");
+        System.out.printf("=  %-10s: %-27s %n", "🛡️ role", role == null ? "" : role);
+        System.out.printf("=  %-10s: %-27s %n", "📧 email", email == null ? "" : email);
+        System.out.println("==============================================");
     }
 }

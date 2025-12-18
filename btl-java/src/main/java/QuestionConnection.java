@@ -13,7 +13,7 @@ public class QuestionConnection {
 
     public QuestionConnection() {
         // Kết nối tới MongoDB
-        MongoClient mongoClient = MongoClients.create("mongodb+srv://nhuthifc_db_user:30122005@netc.smhimsa.mongodb.net/");
+        MongoClient mongoClient = MongoClients.create("mongodb+srv://nhutrunghai_db_user:SaQjyJC8xvwjpI20@cluster0.9rj7y8x.mongodb.net/");
         MongoDatabase database = mongoClient.getDatabase("quiz");
         this.collection = database.getCollection("Questions");
     }

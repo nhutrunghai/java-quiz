@@ -17,8 +17,8 @@ public class HandleHistory {
 		HistoryConnection historyConn = new HistoryConnection();
 		Iterable<Document> docs = historyConn.findHistoryByUser(userId, 10);
 		
-		System.out.println(String.format("%-4s | %-15s | %-12s | %-5s | %-12s | %-15s", "STT", "Username", "Tien",
-				"Level", "Trang thai", "Thoi gian"));
+		System.out.println(String.format("%-4s | %-15s | %-12s | %-5s | %-12s | %-15s", "STT", "Username", "💰 Tien",
+				"⭐ Level", "📜 Trang thai", "⏱️ Thoi gian"));
 		System.out.println("----------------------------------------------------------------------------");
 
 		boolean found = false;
@@ -41,7 +41,7 @@ public class HandleHistory {
 			stt++;
 		}
 		if (!found) {
-			System.out.println("🟡 Khong co lich su choi nao.");
+			System.out.println("ℹ️ Khong co lich su choi nao.");
 		}
 
 	}

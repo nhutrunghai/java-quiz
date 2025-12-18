@@ -54,17 +54,17 @@ public class HandleQuestion {
 
             // VÒNG LẶP XỬ LÝ TRONG 1 CÂU HỎI
             while (!questionResolved) {
-                System.out.println("\n" + YELLOW + "================= CÂU " + i + " [" + REWARDS[i] + " VNĐ] =================" + RESET);
+                System.out.println("\n" + YELLOW + "🟡 CAU " + i + " [" + REWARDS[i] + " VND] 🟡" + RESET);
                 System.out.println(q.getQuestion());
                 printOptions(q.getOptions(), mask);
 
-                System.out.println("\n--- TRỢ GIÚP ---");
-                if (help5050) System.out.print("[5] 50/50  ");
-                if (helpCall) System.out.print("[6] Gọi điện  ");
-                if (helpChange) System.out.print("[7] Đổi câu  ");
-                if (helpAudience) System.out.print("[8] Khán giả  ");
-                System.out.println("\n[0] Dừng cuộc chơi");
-                System.out.print("Lựa chọn của bạn (A/B/C/D hoặc số): ");
+                System.out.println("\n--- 🆘 TRO GIUP ---");
+                if (help5050) System.out.print("[5] 🔀 50/50  ");
+                if (helpCall) System.out.print("[6] 📞 Goi dien  ");
+                if (helpChange) System.out.print("[7] 🔄 Doi cau  ");
+                if (helpAudience) System.out.print("[8] 👥 Khan gia  ");
+                System.out.println("\n[0] ✋ Dung cuoc choi");
+                System.out.print("Lua chon cua ban (A/B/C/D hoac so): ");
 
                 String choice = sc.nextLine().trim().toUpperCase();
                 if (choice.isEmpty()) continue;
@@ -74,8 +74,8 @@ public class HandleQuestion {
                         if (help5050) {
                             mask = Help.fiftyFiftyMask(q);
                             help5050 = false;
-                            System.out.println(GREEN + ">>> Đã loại bỏ 2 phương án sai." + RESET);
-                        } else System.out.println(RED + "Đã dùng rồi!" + RESET);
+                            System.out.println(GREEN + ">>> ✅ Da loai bo 2 phuong an sai." + RESET);
+                        } else System.out.println(RED + "❌ Da dung roi!" + RESET);
                         break;
 
                     case "6":
@@ -83,13 +83,13 @@ public class HandleQuestion {
                             // Lấy trực tiếp đáp án đúng từ câu hỏi hiện tại
                             char correctAns = q.getCorrect(); 
                             helpCall = false;
-                            System.out.println(GREEN + ">>> Người thân: Tôi tin chắc đáp án đúng là " + correctAns + RESET);
-                        } else System.out.println(RED + "Đã dùng rồi!" + RESET);
+                            System.out.println(GREEN + ">>> 📞 Nguoi than: Toi tin dap an dung la " + correctAns + RESET);
+                        } else System.out.println(RED + "❌ Da dung roi!" + RESET);
                         break;
 
                     case "7":
                         if (helpChange) {
-                            System.out.println(YELLOW + ">>> Đang tìm một câu hỏi khác cùng mức độ..." + RESET);
+                            System.out.println(YELLOW + ">>> 🔄 Dang tim mot cau hoi khac cung muc do..." + RESET);
                             
                             // Lấy một câu hỏi mới. 
                             // QuestionRepository của bạn nên có logic để không bốc trúng q cũ
@@ -104,19 +104,19 @@ public class HandleQuestion {
                                 q = newQuestion;
                                 mask = new boolean[]{true, true, true, true}; // Reset mask cho câu mới
                                 helpChange = false;
-                                System.out.println(GREEN + ">>> Đã đổi câu hỏi thành công!" + RESET);
+                                System.out.println(GREEN + ">>> ✅ Da doi cau hoi thanh cong!" + RESET);
                             } else {
-                                System.out.println(RED + "Không còn câu hỏi nào khác ở mức này!" + RESET);
+                                System.out.println(RED + "❌ Khong con cau hoi nao khac o muc nay!" + RESET);
                             }
-                        } else System.out.println(RED + "Đã dùng rồi!" + RESET);
+                        } else System.out.println(RED + "❌ Da dung roi!" + RESET);
                         break;
 
                     case "8":
                         if (helpAudience) {
                             int[] p = Help.audiencePoll(q);
-                            System.out.println(GREEN + ">>> Khán giả: A:" + p[0] + "% | B:" + p[1] + "% | C:" + p[2] + "% | D:" + p[3] + "%" + RESET);
+                            System.out.println(GREEN + ">>> 👥 Khan gia: A:" + p[0] + "% | B:" + p[1] + "% | C:" + p[2] + "% | D:" + p[3] + "%" + RESET);
                             helpAudience = false;
-                        } else System.out.println(RED + "Đã dùng rồi!" + RESET);
+                        } else System.out.println(RED + "❌ Da dung roi!" + RESET);
                         break;
 
                     case "0":

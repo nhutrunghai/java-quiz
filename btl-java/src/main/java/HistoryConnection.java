@@ -20,7 +20,7 @@ public class HistoryConnection {
 	public HistoryConnection() {
 		// Tùy chỉnh URI/DB nếu cần
 		MongoClient client = MongoClients
-				.create("mongodb+srv://nhuthifc_db_user:30122005@netc.smhimsa.mongodb.net/");
+				.create("mongodb+srv://nhutrunghai_db_user:SaQjyJC8xvwjpI20@cluster0.9rj7y8x.mongodb.net/");
 		MongoDatabase database = client.getDatabase("quiz");
 		this.collection = database.getCollection("records");
 	}

@@ -92,23 +92,23 @@ public class Main {
 
 			loggedInUser = login.welcome();
 		}
-		System.out.println(GREEN + "Dang nhap thanh cong! Chao mung " + loggedInUser.getString("username") + RESET);
+		System.out.println(GREEN + "✅ Dang nhap thanh cong! Chao mung " + loggedInUser.getString("username") + RESET);
 		return loggedInUser;
 	}
 
 	private static int showMainMenu(Scanner sc, boolean isAdmin) {
 		while (true) {
-			System.out.println("\n===== MENU CHINH =====");
-			System.out.println("1. Bat dau choi");
-			System.out.println("2. Thong tin ca nhan");
-			System.out.println("3. Xem lich su choi");
-			System.out.println("4. Thong ke nguoi choi");
-			System.out.println("5. Bang xep hang");
+			System.out.println("\n===== 📜 MENU CHINH =====");
+			System.out.println("1. 🎮 Bat dau choi");
+			System.out.println("2. 👤 Thong tin ca nhan");
+			System.out.println("3. 🕓 Xem lich su choi");
+			System.out.println("4. 📊 Thong ke nguoi choi");
+			System.out.println("5. 🏆 Bang xep hang");
 			if (isAdmin) {
-				System.out.println("6. Quan tri admin");
+				System.out.println("6. 🛠️ Quan tri admin");
 			}
-			System.out.println("0. Dang xuat");
-			System.out.print("Chon (0-" + (isAdmin ? "6" : "5") + "): ");
+			System.out.println("0. 🚪 Dang xuat");
+			System.out.print("👉 Chon (0-" + (isAdmin ? "6" : "5") + "): ");
 			if (!sc.hasNextInt()) {
 				System.out.println("Vui long nhap so hop le.");
 				sc.nextLine();

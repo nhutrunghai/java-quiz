@@ -32,15 +32,15 @@ public class HandlePlayer {
 		}
 
 		if (totalGames == 0) {
-			System.out.println("Khong co lich su choi nao cho nguoi dung: " + username);
+			System.out.println("ℹ️ Khong co lich su choi nao cho nguoi dung: " + username);
 			return;
 		}
 
 		int avgQuestions = totalGames > 0 ? (int) Math.round((double) totalQuestions / totalGames) : 0;
 		String totalTimeFormatted = formatDuration(totalSeconds);
 
-		System.out.println(String.format("%-4s | %-15s | %-15s | %-20s | %-15s | %-15s", "STT", "Username", "Tong tran",
-				"Tong thoi gian", "Tong so cau", "Trung binh cau"));
+		System.out.println(String.format("%-4s | %-15s | %-15s | %-20s | %-15s | %-15s", "STT", "Username", "🎮 Tong tran",
+				"⏱️ Tong thoi gian", "❓ Tong so cau", "📊 Trung binh cau"));
 		System.out.println(
 				"--------------------------------------------------------------------------------------------------------");
 		System.out.println(String.format("%-4d | %-15s | %-15d | %-20s | %-15d | %-15d", 1, username, totalGames,
