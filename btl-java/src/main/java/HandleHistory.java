@@ -45,7 +45,11 @@ public class HandleHistory {
 		}
 
 	}
-
+	public static void writeHistory(String userId, Instant startTime, Instant endTime, int finalScore, int highestLevel,
+			String gameStatus, boolean isSafeWin) {
+		HistoryConnection historyConn = new HistoryConnection();
+		historyConn.addHistory(userId, startTime, endTime, finalScore, highestLevel, gameStatus, isSafeWin);
+	}
 	private static String formatRelativeTime(Instant now, Instant target) {
 		if (target == null) {
 			return "N/A";
@@ -65,13 +69,13 @@ public class HandleHistory {
 		}
 		long hours = duration.toHours();
 		if (hours >= 1) {
-			return String.format("%d gio", hours);
+			return String.format("%d gio truoc", hours);
 		}
 		long minutes = duration.toMinutes();
 		if (minutes >= 1) {
-			return String.format("%d phut", minutes);
+			return String.format("%d phut truoc", minutes);
 		}
 		long seconds = duration.getSeconds();
-		return String.format("%d giay", seconds);
+		return String.format("%d giay truoc", seconds);
 	}
 }

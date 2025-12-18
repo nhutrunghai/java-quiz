@@ -24,35 +24,58 @@ public class Main {
 			int choice = showMainMenu(sc, isAdmin);
 			switch (choice) {
 			case 1:
+				// Bắt đầu trò chơi
 				HandleQuestion.Result result = HandleQuestion.play(sc);
+				
 				if (result != null) {
-					System.out.println("\n===== KET QUA =====");
-					System.out.println("Nguoi choi: " + loggedInUser.getString("username"));
-					System.out.println("So cau dung: " + result.getCorrectCount());
-					System.out.println("Tien thuong: " + result.getMoney() + " VND");
+					String currentUserID = loggedInUser.getObjectId("_id").toHexString();
+					String currentUsername = loggedInUser.getString("username");
+					// 1. Ghi vào lịch sử chơi
+					HandleHistory.writeHistory(currentUserID,result.getStartTime(), result.getEndTime(), result.getMoney(),
+							result.getCorrectCount() + 1, result.getStatus(), result.getIsSafeWin());
+					
+					// 2. Cập nhật tiền vào MongoDB
+					// Lấy số tiền hiện tại của User (ép kiểu double an toàn)
+					if(result.getMoney() > 0){
+						// Cong them vao so du hien tai thay vi set lai toan bo
+						userService.updateMoney(currentUsername, result.getMoney());
+
+						// Cap nhat lai so du trong doi tuong dang dang nhap cho lan choi sau
+						Object moneyObj = loggedInUser.get("money");
+						double oldMoney = 0;
+						if (moneyObj instanceof Double) oldMoney = (Double) moneyObj;
+						else if (moneyObj instanceof Integer) oldMoney = ((Integer) moneyObj).doubleValue();
+						loggedInUser.put("money", oldMoney + result.getMoney());
+					}
+
+					System.out.println(YELLOW + "💰 Số tiền nhận được : " + result.getMoney() +  RESET);
+					
 				}
 				break;
 			case 2:
+				handleGetInfo.showInfo(loggedInUser.getObjectId("_id").toHexString());
+				break;
+			case 3:
 				System.out.println(
 						"\n=====📜 LICH SU CHOI CUA " + loggedInUser.getString("username").toUpperCase() + " =====");
 				HandleHistory.showHistory(loggedInUser.getObjectId("_id").toHexString(),
 						loggedInUser.getString("username"));
 				break;
-			case 3:
+			case 4:
 				System.out.println(
 						"\n=====📜 THONG KE NGUOI CHOI " + loggedInUser.getString("username").toUpperCase() + " =====");
 				HandlePlayer.showPlayerStats(loggedInUser.getObjectId("_id").toHexString(),
 						loggedInUser.getString("username"));
 				break;
-			case 4:
-				System.out.println("Bang xep hang tam thoi chua ho tro.");
-				break;
 			case 5:
+				userService.displayLeaderboard();
+				break;
+			case 6:
 				Manage admin = new Manage();
 				admin.manage_user();
 				break;
 			case 0:
-				System.out.println("Dang xuat...");
+				System.out.println("Dang xuat...");	
 				loggedInUser = loginLoop(userService);
 				isAdmin = "admin".equalsIgnoreCase(loggedInUser.getString("role"));
 				break;
@@ -77,14 +100,15 @@ public class Main {
 		while (true) {
 			System.out.println("\n===== MENU CHINH =====");
 			System.out.println("1. Bat dau choi");
-			System.out.println("2. Xem lich su choi");
-			System.out.println("3. Thong ke nguoi choi");
-			System.out.println("4. Bang xep hang");
+			System.out.println("2. Thong tin ca nhan");
+			System.out.println("3. Xem lich su choi");
+			System.out.println("4. Thong ke nguoi choi");
+			System.out.println("5. Bang xep hang");
 			if (isAdmin) {
-				System.out.println("5. Quan tri admin");
+				System.out.println("6. Quan tri admin");
 			}
 			System.out.println("0. Dang xuat");
-			System.out.print("Chon (0-" + (isAdmin ? "5" : "4") + "): ");
+			System.out.print("Chon (0-" + (isAdmin ? "6" : "5") + "): ");
 			if (!sc.hasNextInt()) {
 				System.out.println("Vui long nhap so hop le.");
 				sc.nextLine();
@@ -92,7 +116,7 @@ public class Main {
 			}
 			int choice = sc.nextInt();
 			sc.nextLine(); // clear newline
-			int maxOption = isAdmin ? 5 : 4;
+			int maxOption = isAdmin ? 6 : 5;
 			if (choice < 0 || choice > maxOption) {
 				System.out.println("Lua chon khong hop le, thu lai.");
 				continue;
@@ -101,95 +125,5 @@ public class Main {
 		}
 	}
 
-	// private static void handleAdminMenu(Scanner sc, Connection userService) {
-	// 	boolean back = false;
-	// 	while (!back) {
-	// 		System.out.println("\n===== HE THONG QUAN LI NGUOI DUNG =====");
-	// 		System.out.println("1. Hien thi danh sach nguoi dung");
-	// 		System.out.println("2. Them nguoi dung moi");
-	// 		System.out.println("3. Cap nhat tien va trang thai");
-	// 		System.out.println("4. Xoa nguoi dung");
-	// 		System.out.println("0. Thoat chuong trinh");
-	// 		System.out.print("Chon chuc nang (0-4): ");
-
-	// 		if (!sc.hasNextInt()) {
-	// 			System.out.println("Vui long chi nhap so!");
-	// 			sc.nextLine();
-	// 			continue;
-	// 		}
-
-	// 		int selected = sc.nextInt();
-	// 		sc.nextLine(); // clear newline
-
-	// 		switch (selected) {
-	// 		case 1:
-	// 			userService.displayAllUsers();
-	// 			break;
-	// 		case 2:
-	// 			System.out.print("Nhap username: ");
-	// 			String user = sc.nextLine();
-	// 			System.out.print("Nhap email: ");
-	// 			String email = sc.nextLine();
-	// 			System.out.print("Nhap password: ");
-	// 			String pass = sc.nextLine();
-
-	// 			Double money = null;
-	// 			while (money == null) {
-	// 				System.out.print("Nhap so tien: ");
-	// 				if (sc.hasNextDouble()) {
-	// 					money = sc.nextDouble();
-	// 					sc.nextLine();
-	// 				} else {
-	// 					System.out.println("Vui long nhap mot so hop le.");
-	// 					sc.nextLine();
-	// 				}
-	// 			}
-
-	// 			System.out.print("Nhap vai tro (ADMIN/USER): ");
-	// 			String role = sc.nextLine();
-	// 			userService.addUser(user, email, pass, money, role);
-	// 			break;
-	// 		case 3:
-	// 			System.out.print("Nhap username can sua: ");
-	// 			String uUpdate = sc.nextLine();
-
-	// 			Double newMoney = null;
-	// 			while (newMoney == null) {
-	// 				System.out.print("Nhap so tien moi: ");
-	// 				if (sc.hasNextDouble()) {
-	// 					newMoney = sc.nextDouble();
-	// 					sc.nextLine();
-	// 				} else {
-	// 					System.out.println("Vui long nhap mot so hop le.");
-	// 					sc.nextLine();
-	// 				}
-	// 			}
-
-	// 			Boolean active = null;
-	// 			while (active == null) {
-	// 				System.out.print("Kich hoat tai khoan? (true/false): ");
-	// 				String activeInput = sc.nextLine().trim().toLowerCase();
-	// 				if (activeInput.equals("true") || activeInput.equals("false")) {
-	// 					active = Boolean.parseBoolean(activeInput);
-	// 				} else {
-	// 					System.out.println("Nhap true hoac false.");
-	// 				}
-	// 			}
-
-	// 			// userService.updateUserStatus(uUpdate, newMoney, active);
-	// 			break;
-	// 		case 4:
-	// 			System.out.print("Nhap username can xoa: ");
-	// 			String uDelete = sc.nextLine();
-	// 			userService.deleteUser(uDelete);
-	// 			break;
-	// 		case 0:
-	// 			System.out.println("Dang thoat khoi menu admin...");
-	// 			back = true;
-	// 			break;
-	// 		default:
-	// 			System.out.println("Lua chon khong hop le!");
-	// 		}
-	// 	}
-	// }
+	
 }

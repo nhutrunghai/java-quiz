@@ -1,187 +1,156 @@
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
 import java.util.Scanner;
-
-/**
- * Chua logic choi cau hoi tach khoi Main de de doc hon.
- */
+import java.time.Instant;
 public class HandleQuestion {
-	private static final String RESET = "\u001B[0m";
-	private static final String RED = "\u001B[31m";
-	private static final String YELLOW = "\u001B[33m";
-	private static final String GREEN = "\u001B[32m";
+    private static final String RESET = "\u001B[0m";
+    private static final String RED = "\u001B[31m";
+    private static final String YELLOW = "\u001B[33m";
+    private static final String GREEN = "\u001B[32m";
 
-	private static final int[] REWARDS = { 0, 200000, 400000, 600000, 1000000, 2000000, 3000000, 6000000, 10000000,
-			14000000, 22000000, 30000000, 40000000, 60000000, 85000000, 150000000 };
+    private static final int[] REWARDS = { 0, 200000, 400000, 600000, 1000000, 2000000, 3000000, 6000000, 10000000,
+            14000000, 22000000, 30000000, 40000000, 60000000, 85000000, 150000000 };
 
-	public static class Result {
-		private final int correctCount;
-		private final int money;
+    public static class Result {
+        private final int correctCount;
+        private final int money;
+		private final String status;
+		private final Boolean isSafeWin;
+		private final Instant startTime ;
+		private final Instant endTime = Instant.now();
+        public Result(int correctCount, int money, String status, Boolean isSafeWin, Instant startTime) {
+            this.correctCount = correctCount;
+            this.money = money;
+			this.status = status;
+			this.isSafeWin = isSafeWin;
+			this.startTime = startTime;
+        }
+        public int getCorrectCount() { return correctCount; }
+        public int getMoney() { return money; }
+        public String getStatus() { return status; }
+        public Boolean getIsSafeWin() { return isSafeWin; }
+		public Instant getStartTime() { return startTime; }
+		public Instant getEndTime() { return endTime; }
+    }
 
-		public Result(int correctCount, int money) {
-			this.correctCount = correctCount;
-			this.money = money;
-		}
+    public static Result play(Scanner sc) {
+        QuestionConnection repo = new QuestionConnection();
+        int correctCount = 0;
+        int money = 0;
+		Instant startTime = Instant.now();
+        // Trạng thái các quyền trợ giúp (mỗi game dùng 1 lần)
+        boolean help5050 = true;
+        boolean helpCall = true;
+        boolean helpChange = true;
+        boolean helpAudience = true;
 
-		public int getCorrectCount() {
-			return correctCount;
-		}
+        for (int i = 1; i <= 15; i++) {
+            Question q = repo.getOneRandomQuestionByLevel(i);
+            if (q == null) {
+                System.out.println("Hết câu hỏi!");
+                break;
+            }
 
-		public int getMoney() {
-			return money;
-		}
-	}
+            boolean[] mask = {true, true, true, true}; 
+            boolean questionResolved = false; 
 
-	public static Result play(Scanner sc) {
-		ArrayList<Question> questions = loadQuestions("questions.txt");
-		if (questions.isEmpty()) {
-			System.out.println("Khong co cau hoi nao! Kiem tra file questions.txt.");
-			return null;
-		}
+            // VÒNG LẶP XỬ LÝ TRONG 1 CÂU HỎI
+            while (!questionResolved) {
+                System.out.println("\n" + YELLOW + "================= CÂU " + i + " [" + REWARDS[i] + " VNĐ] =================" + RESET);
+                System.out.println(q.getQuestion());
+                printOptions(q.getOptions(), mask);
 
-		boolean used50 = false, usedAudience = false, usedCall = false;
-		int correctCount = 0;
-		int money = 0;
-		int maxQ = Math.min(15, questions.size());
+                System.out.println("\n--- TRỢ GIÚP ---");
+                if (help5050) System.out.print("[5] 50/50  ");
+                if (helpCall) System.out.print("[6] Gọi điện  ");
+                if (helpChange) System.out.print("[7] Đổi câu  ");
+                if (helpAudience) System.out.print("[8] Khán giả  ");
+                System.out.println("\n[0] Dừng cuộc chơi");
+                System.out.print("Lựa chọn của bạn (A/B/C/D hoặc số): ");
 
-		for (int i = 0; i < maxQ; i++) {
-			Question q = questions.get(i);
-			System.out.println(RED + "\nCau " + (i + 1) + ": " + q.getQuestion() + RESET);
-			boolean[] showMask = new boolean[] { true, true, true, true };
-			printOptions(q.getOptions(), showMask);
+                String choice = sc.nextLine().trim().toUpperCase();
+                if (choice.isEmpty()) continue;
 
-			System.out.println();
-			System.out.println(YELLOW + "Nhap A/B/C/D de tra loi hoac chon so de dung tro giup:" + RESET);
-			System.out.println(YELLOW + "1) 50/50   2) Hoi khan gia   3) Goi dien   0) Dung choi" + RESET);
-			System.out.print("Lua chon: ");
-			String choice = sc.nextLine().trim();
+                switch (choice) {
+                    case "5":
+                        if (help5050) {
+                            mask = Help.fiftyFiftyMask(q);
+                            help5050 = false;
+                            System.out.println(GREEN + ">>> Đã loại bỏ 2 phương án sai." + RESET);
+                        } else System.out.println(RED + "Đã dùng rồi!" + RESET);
+                        break;
 
-			if (choice.equals("1")) {
-				if (used50) {
-					System.out.println("Ban da dung 50/50 roi!");
-					i--;
-					continue;
-				}
-				used50 = true;
-				boolean[] mask = Help.fiftyFiftyMask(q);
-				printOptions(q.getOptions(), mask);
-				System.out.print("Tra loi: ");
-				String ans = sc.nextLine().trim().toUpperCase();
-				if (ans.length() == 1 && ans.charAt(0) == q.getCorrect()) {
-					System.out.println(GREEN + "Do. Chinh xac!" + RESET);
-					correctCount++;
-					money = REWARDS[correctCount];
-				} else {
-					System.out.println("Sai! Dap an dung: " + q.getCorrect());
-					break;
-				}
-			} else if (choice.equals("2")) {
-				if (usedAudience) {
-					System.out.println("Ban da dung hoi khan gia roi!");
-					i--;
-					continue;
-				}
-				usedAudience = true;
-				int[] percent = Help.audiencePoll(q);
-				System.out.println(YELLOW + "\nKet qua binh chon:" + RESET);
-				char cc = 'A';
-				for (int p : percent) {
-					System.out.printf("%c: %d%%   ", cc, p);
-					cc++;
-				}
-				System.out.println();
-				System.out.print("Tra loi: ");
-				String ans = sc.nextLine().trim().toUpperCase();
-				if (ans.length() == 1 && ans.charAt(0) == q.getCorrect()) {
-					System.out.println(GREEN + "Do. Chinh xac!" + RESET);
-					correctCount++;
-					money = REWARDS[correctCount];
-				} else {
-					System.out.println("Sai! Dap an dung: " + q.getCorrect());
-					break;
-				}
-			} else if (choice.equals("3")) {
-				if (usedCall) {
-					System.out.println("Ban da goi dien roi!");
-					i--;
-					continue;
-				}
-				usedCall = true;
-				String[] friends = { "ban than", "me", "anh", "chi", "bac" };
-				String who = friends[new Random().nextInt(friends.length)];
-				char suggest = Help.callFriendSuggest(q);
-				System.out.println(YELLOW + who + " goi y dap an la: " + suggest + RESET);
-				System.out.print("Tra loi: ");
-				String ans = sc.nextLine().trim().toUpperCase();
-				if (ans.length() == 1 && ans.charAt(0) == q.getCorrect()) {
-					System.out.println(GREEN + "Do. Chinh xac!" + RESET);
-					correctCount++;
-					money = REWARDS[correctCount];
-				} else {
-					System.out.println("Sai! Dap an dung: " + q.getCorrect());
-					break;
-				}
-			} else if (choice.equals("0")) {
-				System.out.println("Ban da dung choi. Ban nhan: " + money + " VND");
-				break;
-			} else {
-				String ans = choice.trim().toUpperCase();
-				if (ans.length() == 1 && ans.charAt(0) == q.getCorrect()) {
-					SoundPlayer.SoundThread successThread = new SoundPlayer.SoundThread("success");
-					successThread.start();
-					System.out.println(GREEN + "Do. Chinh xac!" + RESET);
-					correctCount++;
-					money = REWARDS[correctCount];
-				} else {
-					SoundPlayer.SoundThread failThread = new SoundPlayer.SoundThread("fail");
-					failThread.start();
+                    case "6":
+                        if (helpCall) {
+                            // Lấy trực tiếp đáp án đúng từ câu hỏi hiện tại
+                            char correctAns = q.getCorrect(); 
+                            helpCall = false;
+                            System.out.println(GREEN + ">>> Người thân: Tôi tin chắc đáp án đúng là " + correctAns + RESET);
+                        } else System.out.println(RED + "Đã dùng rồi!" + RESET);
+                        break;
 
-					System.out.println("Sai! Dap an dung: " + q.getCorrect());
-					break;
-				}
-			}
+                    case "7":
+                        if (helpChange) {
+                            System.out.println(YELLOW + ">>> Đang tìm một câu hỏi khác cùng mức độ..." + RESET);
+                            
+                            // Lấy một câu hỏi mới. 
+                            // QuestionRepository của bạn nên có logic để không bốc trúng q cũ
+                            Question newQuestion = repo.getOneRandomQuestionByLevel(i);
+                            
+                            // Kiểm tra nếu chẳng may bốc trùng (nếu repo chưa xử lý loại trừ)
+                            if (newQuestion != null && newQuestion.getQuestion().equals(q.getQuestion())) {
+                                newQuestion = repo.getOneRandomQuestionByLevel(i); 
+                            }
 
-			if (i == maxQ - 1) {
-				System.out.println(GREEN + "\nBan da hoan thanh tat ca cau hoi!" + RESET);
-			}
-		}
+                            if (newQuestion != null) {
+                                q = newQuestion;
+                                mask = new boolean[]{true, true, true, true}; // Reset mask cho câu mới
+                                helpChange = false;
+                                System.out.println(GREEN + ">>> Đã đổi câu hỏi thành công!" + RESET);
+                            } else {
+                                System.out.println(RED + "Không còn câu hỏi nào khác ở mức này!" + RESET);
+                            }
+                        } else System.out.println(RED + "Đã dùng rồi!" + RESET);
+                        break;
 
-		return new Result(correctCount, money);
-	}
+                    case "8":
+                        if (helpAudience) {
+                            int[] p = Help.audiencePoll(q);
+                            System.out.println(GREEN + ">>> Khán giả: A:" + p[0] + "% | B:" + p[1] + "% | C:" + p[2] + "% | D:" + p[3] + "%" + RESET);
+                            helpAudience = false;
+                        } else System.out.println(RED + "Đã dùng rồi!" + RESET);
+                        break;
 
-	private static ArrayList<Question> loadQuestions(String filename) {
-		ArrayList<Question> list = new ArrayList<>();
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"))) {
-			String line;
-			while ((line = br.readLine()) != null) {
-				if (line.trim().isEmpty())
-					continue;
-				String[] p = line.split("\\|");
-				if (p.length >= 6) {
-					list.add(new Question(p[0], p[1], p[2], p[3], p[4], p[5].trim().charAt(0)));
-				}
-			}
-		} catch (IOException e) {
-			System.out.println("Loi doc file questions: " + e.getMessage());
-		}
-		Collections.shuffle(list);
-		return list;
-	}
+                    case "0":
+                        return new Result(correctCount, money,"Dừng chơi",true, startTime	);
 
-	private static void printOptions(String[] opts, boolean[] showMask) {
-		char ch = 'A';
-		for (int i = 0; i < 4; i++) {
-			if (showMask == null || showMask[i]) {
-				System.out.println(ch + ". " + opts[i]);
-			} else {
-				System.out.println(ch + ". ----");
-			}
-			ch++;
-		}
-	}
+                    case "A": case "B": case "C": case "D":
+                        char userAns = choice.charAt(0);
+                        if (userAns == q.getCorrect()) {
+                            System.out.println(GREEN + "✅ CHÍNH XÁC!" + RESET);
+                            correctCount++;
+                            money = REWARDS[correctCount];
+                            questionResolved = true; // Thoát while -> Tự động sang câu for tiếp theo
+                            
+                        } else {
+							
+                            System.out.println(RED + "❌ SAI RỒI! Đáp án là: " + q.getCorrect() + RESET);
+                            return new Result(correctCount, 0, "Trả lời sai", false, startTime);
+                        }
+                        break;
+
+                    default:
+                        System.out.println(RED + "Lựa chọn không hợp lệ!" + RESET);
+                        break;
+                }
+            }
+        }
+        return new Result(correctCount, money, "Chiến thắng", true, startTime);
+    }
+
+    private static void printOptions(String[] opts, boolean[] mask) {
+        char label = 'A';
+        for (int i = 0; i < 4; i++) {
+            System.out.println(label + ". " + (mask[i] ? opts[i] : "---"));
+            label++;
+        }
+    }
 }

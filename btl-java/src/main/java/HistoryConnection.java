@@ -35,7 +35,6 @@ public class HistoryConnection {
 				.append("highest_level", highestLevel).append("game_status", gameStatus)
 				.append("is_safe_win", isSafeWin);
 		collection.insertOne(doc);
-		System.out.println("Đã lưu lịch sử chơi cho user_id: " + userId);
 	}
 
 	/**
