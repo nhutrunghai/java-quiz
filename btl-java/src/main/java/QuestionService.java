@@ -11,16 +11,15 @@ public class QuestionService {
 	private MongoCollection<Document> qCollection;
 
 	public QuestionService() {
-		// 1. Khởi tạo kết nối
+
 		QuestionConnection conn = new QuestionConnection();
 
-		// 2. Chọn thẳng collection "questions" thông qua hàm mới viết
+
 		this.qCollection = conn.getqCollection();
 
 	}
 
-	// 1. THÊM CÂU HỎI
-	// Hàm Thêm
+
 	public void addQuestion(int id, int level, String text, Map<String, String> opts, String correct) {
 		Document optionsObj = new Document().append("A", opts.get("A")).append("B", opts.get("B"))
 				.append("C", opts.get("C")).append("D", opts.get("D"));
@@ -39,7 +38,6 @@ public class QuestionService {
 		return doc != null;
 	}
 
-	// 2. HIỂN THỊ DANH SÁCH
 
 	public void displayAllQuestions() {
 		System.out.println("\n--- 📚 DANH SÁCH CÂU HỎI ---");
@@ -49,8 +47,7 @@ public class QuestionService {
 		for (Document doc : qCollection.find()) {
 			int id = doc.getInteger("question_id");
 
-			// Dùng getInteger thay vì getString
-			// Tham số thứ 2 (0) là giá trị mặc định nếu level bị null
+
 			int lvl = doc.getInteger("level", 0);
 
 			String text = doc.getString("question_text");
@@ -59,7 +56,7 @@ public class QuestionService {
 		}
 	}
 
-	// 3. CẬP NHẬT CÂU HỎI (Thêm để lớp ManageQuestions gọi được)
+
 	public void updateQuestion(int id, int level, String text, Map<String, String> opts, String correct) {
 		Document optionsObj = new Document()
 				.append("A", opts.get("A"))
@@ -72,7 +69,7 @@ public class QuestionService {
 						Updates.set("options", optionsObj), Updates.set("correct_answer", correct.toUpperCase())));
 	}
 
-	// 4. XÓA CÂU HỎI
+
 	public void deleteQuestion(int id) {
 		qCollection.deleteOne(eq("question_id", id));
 		System.out.println("❌ Đã xóa câu hỏi ID: " + id);

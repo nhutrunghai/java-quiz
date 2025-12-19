@@ -3,14 +3,8 @@ import java.util.Date;
 
 import org.bson.Document;
 
-/**
- * Tổng hợp thống kê lịch sử chơi của một người chơi.
- */
 public class HandlePlayer {
 
-	/**
-	 * Hiển thị thống kê: số trận, tổng thời gian chơi, trung bình số câu trả lời/trận.
-	 */
 	public static void showPlayerStats(String userId, String username) {
 		HistoryConnection historyConn = new HistoryConnection();
 		Iterable<Document> docs = historyConn.findHistoryByUser(userId, Integer.MAX_VALUE);

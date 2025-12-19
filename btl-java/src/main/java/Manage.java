@@ -32,7 +32,6 @@ public class Manage {
 			System.out.print("👉 Chọn chức năng (0-4): ");
 
 			int selected;
-			// Kiểm tra nếu người dùng nhập không phải là số
 			if (!scanner.hasNextInt()) {
 				System.out.println("⚠️ Vui lòng chỉ nhập số!");
 				scanner.next();
@@ -40,7 +39,7 @@ public class Manage {
 			}
 
 			selected = scanner.nextInt();
-			scanner.nextLine(); // Đọc bỏ dòng trống sau khi nhập số
+			scanner.nextLine(); 
 
 			switch (selected) {
 			case 1:
@@ -58,15 +57,12 @@ public class Manage {
 				String email = scanner.nextLine();
 				System.out.print("🔒 Nhập password: ");
 				String pass = scanner.nextLine();
-//				System.out.print("Nhập số tiền: ");
-//				double money = scanner.nextDouble();
-//				scanner.nextLine();
 				double money;
 				while (true) {
 					try {
 						System.out.print("💰 Nhập số tiền: ");
-						String input = scanner.nextLine(); // Đọc dạng chuỗi trước
-						money = Double.parseDouble(input); // Thử chuyển sang số
+						String input = scanner.nextLine(); 
+						money = Double.parseDouble(input);
 
 						if (money <= 0) {
 						System.out.println("⚠️ Số tiền không được bằng 0 hoặc âm. Vui lòng nhập lại!");
@@ -95,9 +91,6 @@ public class Manage {
 			case 3:
 				System.out.print("👤 Nhập username cần sửa thông tin: ");
 				String uUpdate = scanner.nextLine();
-
-				// Kiểm tra xem người dùng có tồn tại không trước khi bắt nhập đống thông tin
-				// (Giả sử bạn có hàm findUser hoặc dùng collection.find trong Connection)
 
 				System.out.println("--- 🆕 Nhập thông tin mới ---");
 				System.out.print("👤 Username mới: ");
@@ -142,7 +135,7 @@ public class Manage {
 					break;
 				}
 
-				// Gọi hàm cập nhật tổng thể
+
 				userService.updateFullUserInfo(uUpdate, nUsername, nEmail, nPass, nMoney, nRole, nStatus);
 				break;
 

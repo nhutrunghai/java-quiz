@@ -1,15 +1,10 @@
 
-/**
- * 
- */
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-/**
- * 
- */
 public class Help {
 	public static final String RESET = "\u001B[0m";
 	public static final String YELLOW = "\u001B[33m";

@@ -36,7 +36,6 @@ public class HandleQuestion {
         int correctCount = 0;
         int money = 0;
 		Instant startTime = Instant.now();
-        // Trạng thái các quyền trợ giúp (mỗi game dùng 1 lần)
         boolean help5050 = true;
         boolean helpCall = true;
         boolean helpChange = true;
@@ -52,7 +51,6 @@ public class HandleQuestion {
             boolean[] mask = {true, true, true, true}; 
             boolean questionResolved = false; 
 
-            // VÒNG LẶP XỬ LÝ TRONG 1 CÂU HỎI
             while (!questionResolved) {
                 System.out.println("\n" + YELLOW + "🟡 CAU " + i + " [" + REWARDS[i] + " VND] 🟡" + RESET);
                 System.out.println(q.getQuestion());
@@ -80,7 +78,7 @@ public class HandleQuestion {
 
                     case "6":
                         if (helpCall) {
-                            // Lấy trực tiếp đáp án đúng từ câu hỏi hiện tại
+
                             char correctAns = q.getCorrect(); 
                             helpCall = false;
                             System.out.println(GREEN + ">>> 📞 Nguoi than: Toi tin dap an dung la " + correctAns + RESET);
@@ -91,18 +89,17 @@ public class HandleQuestion {
                         if (helpChange) {
                             System.out.println(YELLOW + ">>> 🔄 Dang tim mot cau hoi khac cung muc do..." + RESET);
                             
-                            // Lấy một câu hỏi mới. 
-                            // QuestionRepository của bạn nên có logic để không bốc trúng q cũ
+
                             Question newQuestion = repo.getOneRandomQuestionByLevel(i);
                             
-                            // Kiểm tra nếu chẳng may bốc trùng (nếu repo chưa xử lý loại trừ)
+
                             if (newQuestion != null && newQuestion.getQuestion().equals(q.getQuestion())) {
                                 newQuestion = repo.getOneRandomQuestionByLevel(i); 
                             }
 
                             if (newQuestion != null) {
                                 q = newQuestion;
-                                mask = new boolean[]{true, true, true, true}; // Reset mask cho câu mới
+                                mask = new boolean[]{true, true, true, true}; 
                                 helpChange = false;
                                 System.out.println(GREEN + ">>> ✅ Da doi cau hoi thanh cong!" + RESET);
                             } else {
@@ -128,7 +125,7 @@ public class HandleQuestion {
                             System.out.println(GREEN + "✅ CHÍNH XÁC!" + RESET);
                             correctCount++;
                             money = REWARDS[correctCount];
-                            questionResolved = true; // Thoát while -> Tự động sang câu for tiếp theo
+                            questionResolved = true; 
                             
                         } else {
 							

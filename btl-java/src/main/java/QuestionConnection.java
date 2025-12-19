@@ -12,24 +12,21 @@ public class QuestionConnection {
     private MongoCollection<Document> collection;
 	private MongoCollection<Document> qCollection;
     public QuestionConnection() {
-        // Kết nối tới MongoDB
+        
         MongoClient mongoClient = MongoClients.create("mongodb+srv://nhutrunghai_db_user:SaQjyJC8xvwjpI20@cluster0.9rj7y8x.mongodb.net/");
         MongoDatabase database = mongoClient.getDatabase("quiz");
         this.collection = database.getCollection("Questions");
-        // Đồng bộ cho QuestionService sử dụng
+       
         this.qCollection = this.collection;
     }
 	public MongoCollection<Document> getqCollection() {
 		return this.qCollection;
 	}
-    /**
-     * Lấy 1 câu hỏi ngẫu nhiên theo level
-     */
+
     public Question getOneRandomQuestionByLevel(int level) {
         List<Question> list = new ArrayList<>();
         
-        // Lưu ý: Đảm bảo trường "level" trong MongoDB là kiểu Số (Int32)
-        // Nếu là kiểu String, hãy dùng: eq("level", String.valueOf(level))
+
         for (Document doc : collection.find(eq("level", level))) {
             try {
                 String qText = doc.getString("question_text");
@@ -39,7 +36,7 @@ public class QuestionConnection {
                 String c = optionsDoc.getString("C");
                 String d = optionsDoc.getString("D");
                 
-                // Tránh lỗi nếu correct_answer bị trống hoặc null
+              
                 String correctStr = doc.getString("correct_answer");
                 char correct = (correctStr != null && !correctStr.isEmpty()) ? correctStr.charAt(0) : 'A';
 

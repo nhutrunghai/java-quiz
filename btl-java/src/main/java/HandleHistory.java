@@ -5,14 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.bson.Document;
 
-/**
- * Hiển thị lịch sử chơi cho người dùng.
- */
 public class HandleHistory {
-
-	/**
-	 * In tối đa 10 bản ghi lịch sử cho user, dạng bảng.
-	 */
 	public static void showHistory(String userId, String username) {
 		HistoryConnection historyConn = new HistoryConnection();
 		Iterable<Document> docs = historyConn.findHistoryByUser(userId, 10);

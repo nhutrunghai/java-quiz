@@ -11,23 +11,19 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 
-/**
- * Kết nối và thao tác collection lịch sử chơi (records).
- */
+
 public class HistoryConnection {
 	private final MongoCollection<Document> collection;
 
 	public HistoryConnection() {
-		// Tùy chỉnh URI/DB nếu cần
+
 		MongoClient client = MongoClients
 				.create("mongodb+srv://nhutrunghai_db_user:SaQjyJC8xvwjpI20@cluster0.9rj7y8x.mongodb.net/");
 		MongoDatabase database = client.getDatabase("quiz");
 		this.collection = database.getCollection("records");
 	}
 
-	/**
-	 * Thêm bản ghi lịch sử chơi.
-	 */
+
 	public void addHistory(String userId, Instant startTime, Instant endTime, int finalScore, int highestLevel,
 			String gameStatus, boolean isSafeWin) {
 		Document doc = new Document("user_id", userId).append("start_time", Date.from(startTime))
@@ -37,9 +33,7 @@ public class HistoryConnection {
 		collection.insertOne(doc);
 	}
 
-	/**
-	 * Lấy danh sách lịch sử theo user_id, sắp xếp end_time giảm dần, giới hạn limit.
-	 */
+
 	public Iterable<Document> findHistoryByUser(String userId, int limit) {
 		if (ObjectId.isValid(userId)) {
 			return collection.find(Filters.or(Filters.eq("user_id", userId), Filters.eq("user_id", new ObjectId(userId))))

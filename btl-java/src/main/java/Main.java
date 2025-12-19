@@ -35,12 +35,8 @@ public class Main {
 							result.getCorrectCount() + 1, result.getStatus(), result.getIsSafeWin());
 					
 					// 2. Cập nhật tiền vào MongoDB
-					// Lấy số tiền hiện tại của User (ép kiểu double an toàn)
 					if(result.getMoney() > 0){
-						// Cong them vao so du hien tai thay vi set lai toan bo
 						userService.updateMoney(currentUsername, result.getMoney());
-
-						// Cap nhat lai so du trong doi tuong dang dang nhap cho lan choi sau
 						Object moneyObj = loggedInUser.get("money");
 						double oldMoney = 0;
 						if (moneyObj instanceof Double) oldMoney = (Double) moneyObj;

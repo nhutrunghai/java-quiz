@@ -1,8 +1,8 @@
 
 public class Question {
 	private String question;
-	private String[] options; // length 4, options[0] -> A, options[1] -> B, ...
-	private char correct; // 'A','B','C','D'
+	private String[] options; 
+	private char correct;
 
 	public Question(String question, String a, String b, String c, String d, char correct) {
 		this.question = question;
@@ -16,7 +16,7 @@ public class Question {
 
 	public String[] getOptions() {
 		return options;
-	} // do not modify original if you want to preserve
+	} 
 
 	public char getCorrect() {
 		return correct;

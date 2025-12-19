@@ -26,10 +26,10 @@ public class ManageQuestions {
 				break;
 
 			switch (choice) {
-			case "2": // THÊM CÂU HỎI
+			case "2": 
 				System.out.println("\n--- THÊM CÂU HỎI MỚI ---");
 				int id = -1;
-				// 1. Kiểm tra ID
+				
 				while (true) {
 					try {
 						System.out.print("🔢 Nhap Question ID (so nguyen): ");
@@ -43,7 +43,7 @@ public class ManageQuestions {
 					}
 				}
 
-				// 2. Kiểm tra Level
+				
 				int lvl = -1;
 				while (true) {
 					try {
@@ -61,7 +61,7 @@ public class ManageQuestions {
 				System.out.print("💬 Noi dung cau hoi: ");
 				String text = scanner.nextLine();
 
-				// 3. Nhập Options
+				
 				Map<String, String> addOpts = new HashMap<>();
 				String[] labels = { "A", "B", "C", "D" };
 				for (String l : labels) {
@@ -69,7 +69,7 @@ public class ManageQuestions {
 					addOpts.put(l, scanner.nextLine());
 				}
 
-				// 4. Kiểm tra Đáp án đúng
+				
 				String correct;
 				while (true) {
 					System.out.print("✅ Dap an dung (A/B/C/D): ");
@@ -84,7 +84,7 @@ public class ManageQuestions {
 				System.out.println("✅ Thêm câu hỏi thành công!");
 				break;
 
-			case "3": // SỬA CÂU HỎI
+			case "3": 
 				System.out.print("\n🔢 Nhap ID cau hoi can sua: ");
 				int editId;
 				try {
@@ -94,7 +94,7 @@ public class ManageQuestions {
 						break;
 					}
 
-					// Nhập các thông tin mới tương tự như case 2
+					
 					System.out.print("⭐ Cap do moi (1-15): ");
 					int nLvl = Integer.parseInt(scanner.nextLine());
 					System.out.print("💬 Noi dung moi: ");
@@ -116,7 +116,7 @@ public class ManageQuestions {
 				}
 				break;
 
-			case "4": // XÓA CÂU HỎI
+			case "4": 
 				System.out.print("🔢 Nhap ID can xoa: ");
 				try {
 					int delId = Integer.parseInt(scanner.nextLine());

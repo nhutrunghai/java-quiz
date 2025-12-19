@@ -4,9 +4,6 @@ import org.bson.Document;
 
 public class handleGetInfo {
 
-    /**
-     * Lay thong tin nguoi dung tu Connection dua tren id nhap vao.
-     */
     public static void showInfo(String userId) {
         if (userId == null || userId.trim().isEmpty()) {
             System.out.println("Khong co thong tin nguoi dung.");
